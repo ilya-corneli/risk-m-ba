@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
+from sklearn.metrics import classification_report, roc_auc_score
 import matplotlib.pyplot as plt
 
 # Генерируем синтетические данные для примера
@@ -18,12 +18,7 @@ debt_ratio = np.random.uniform(0, 1, n_samples)
 
 # Создаем целевую переменную (0 - хороший клиент, 1 - плохой клиент)
 # Используем некоторую логику для определения дефолта
-probability = 1 / (1 + np.exp(-(
-    -0.02 * (age - 35) +
-    -0.03 * ((income - 50000) / 10000) +
-    -0.02 * ((credit_history - 600) / 100) +
-    2 * (debt_ratio - 0.5)
-)))
+probability = 1 / (1 + np.exp(-(    -0.02 * (age - 35) +    -0.03 * ((income - 50000) / 10000) +    -0.02 * ((credit_history - 600) / 100) +    2 * (debt_ratio - 0.5))))
 default = (np.random.random(n_samples) < probability).astype(int)
 
 # Создаем DataFrame
@@ -69,10 +64,13 @@ print("\nВажность признаков:")
 print(feature_importance.sort_values('importance', ascending=False))
 
 def predict_credit_risk(age, income, credit_history, debt_ratio):
-    """
-    Функция для предсказания риска дефолта для нового клиента
-    """
-    features = np.array([[age, income, credit_history, debt_ratio]])
+    """Функция для предсказания риска дефолта для нового клиента"""
+    features = pd.DataFrame({
+        'age': [age],
+        'income': [income],
+        'credit_history': [credit_history],
+        'debt_ratio': [debt_ratio]
+    })
     features_scaled = scaler.transform(features)
     probability = model.predict_proba(features_scaled)[0][1]
     return probability
@@ -85,4 +83,3 @@ new_client = predict_credit_risk(
     debt_ratio=0.3
 )
 print(f"\nВероятность дефолта для нового клиента: {new_client:.2%}")
-
